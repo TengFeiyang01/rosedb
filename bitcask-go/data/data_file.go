@@ -50,7 +50,7 @@ func (df *DataFile) ReadLogRecord(offset int64) (*LogRecord, int64, error) {
 	}
 
 	// 读取 Header 信息
-	headerBuf, err := df.readNBytes(maxLogRecordHeaderSize, offset)
+	headerBuf, err := df.readNBytes(headerBytes, offset)
 	if err != nil {
 		return nil, 0, err
 	}

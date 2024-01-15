@@ -18,6 +18,24 @@ type Options struct {
 	IndexType IndexerType
 }
 
+// IteratorOptions 索引迭代器配置项
+type IteratorOptions struct {
+	// 遍历前缀为指定值的 Key，默认为空
+	Prefix []byte
+
+	// 是否反向遍历，默认false是正向
+	Reverse bool
+}
+
+// WriteBatchOptions 批量写配置项
+type WriteBatchOptions struct {
+	// 一个批次当中最大的数据量
+	MaxBatchSize uint
+
+	// 提交事务的时候，是否进行可持久化
+	SyncWrites bool
+}
+
 type IndexerType = int8
 
 const (
@@ -33,4 +51,14 @@ var DefaultOptions = Options{
 	DataFileSize: 256 * 1024 * 1024, // 256MB
 	SyncWrites:   false,
 	IndexType:    Btree,
+}
+
+var DefaultIteratorOptions = IteratorOptions{
+	Prefix:  nil,
+	Reverse: false,
+}
+
+var DefaultWriteBatchOptions = WriteBatchOptions{
+	MaxBatchSize: 10000,
+	SyncWrites:   true,
 }

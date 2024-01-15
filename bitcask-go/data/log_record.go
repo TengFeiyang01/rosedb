@@ -10,6 +10,7 @@ type LogRecordType = byte
 const (
 	LogRecordNormal LogRecordType = iota
 	LogRecordDeleted
+	LogRecordTxnFinished
 )
 
 // crc type keySize valueSize
@@ -38,12 +39,18 @@ type LogRecordPos struct {
 	Offset int64  //偏移，表示将数据存储到了数据文件中的哪个位置
 }
 
+// TransactionRecord 暂存的事务相关的数据
+type TransactionRecord struct {
+	Record *LogRecord
+	Pos    *LogRecordPos
+}
+
 // EncodeLogRecord 对 LogRecord 进行编码，返回字节数组及长度
 // +-----------+------------+-------------+--------------+-----------+---------------+
 // / crc 校验值 /  type 类型  /  key size   /  value size  /    key    /     value     /
 // +-----------+------------+-------------+--------------+-----------+---------------+
 //
-//	4字节 		 1字节	  变长（最大5）	 变长（最大5）       变长			变长
+//	4字节 		 1字节	     变长（最大5）	 变长（最大5）       变长			变长
 func EncodeLogRecord(logRecord *LogRecord) ([]byte, int64) {
 	// 初始化一个 header 部分的字节数组
 	header := make([]byte, maxLogRecordHeaderSize)
