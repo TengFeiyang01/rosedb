@@ -62,7 +62,7 @@ func (db *DB) Merge() error {
 
 	mergePath := db.getMergePath()
 	// 如果目录存在，说明发生过 merge 将其删除掉
-	if _, err := os.Stat(mergePath); err != nil {
+	if _, err := os.Stat(mergePath); err == nil {
 		if err := os.RemoveAll(mergePath); err != nil {
 			return err
 		}
@@ -158,8 +158,8 @@ func (db *DB) getMergePath() string {
 func (db *DB) loadMergeFiles() error {
 	mergePath := db.getMergePath()
 	// merge 目录不存在的话 直接返回
-	if _, err := os.Stat(mergePath); err != nil {
-		return err
+	if _, err := os.Stat(mergePath); os.IsNotExist(err) {
+		return nil
 	}
 	defer func() {
 		_ = os.RemoveAll(mergePath)
@@ -236,12 +236,12 @@ func (db *DB) loadIndexFromHintFile() error {
 	}
 
 	//打开 hint 索引文件
-	hintFile, err := data.OpenHintFile(hintFileName)
+	hintFile, err := data.OpenHintFile(db.options.DirPath)
 	if err != nil {
 		return err
 	}
 	// 读取文件中的索引
-	var offset int64
+	var offset int64 = 0
 	for {
 		logRecord, size, err := hintFile.ReadLogRecord(offset)
 		if err != nil {
