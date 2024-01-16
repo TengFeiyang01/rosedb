@@ -55,6 +55,7 @@ func (bt *BTree) Size() int {
 	return bt.tree.Len()
 }
 
+// Iterator 返回迭代器的一个方法
 func (bt *BTree) Iterator(reverse bool) Iterator {
 	if bt.tree == nil {
 		return nil

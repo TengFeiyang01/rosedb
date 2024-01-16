@@ -2,7 +2,6 @@ package bitcask_go
 
 import (
 	"bitcask-go/utils"
-	"bytes"
 	"github.com/stretchr/testify/assert"
 	"os"
 	"testing"
@@ -284,10 +283,8 @@ func TestDB_Fold(t *testing.T) {
 
 	var check func([]byte, []byte) bool
 	check = func(key []byte, value []byte) bool {
-		t.Log(string(key), string(value))
-		if bytes.Compare(key, []byte("Alex")) == 0 {
-			return false
-		}
+		assert.NotNil(t, key)
+		assert.NotNil(t, value)
 		return true
 	}
 

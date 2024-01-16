@@ -14,6 +14,7 @@ func TestOpenDataFile(t *testing.T) {
 	dataFile2, err := OpenDataFile(os.TempDir(), 111)
 	assert.Nil(t, err)
 	assert.NotNil(t, dataFile2)
+	t.Log(os.TempDir())
 
 	dataFile3, err := OpenDataFile(os.TempDir(), 0)
 	assert.Nil(t, err)

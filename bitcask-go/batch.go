@@ -66,15 +66,17 @@ func (wb *WriteBatch) Delete(key []byte) error {
 	return nil
 }
 
-// Commit 提交事务
+// Commit 提交事务 将暂存的数据写到数据文件，并更新内存索引
 func (wb *WriteBatch) Commit() error {
 	wb.mu.Lock()
 	defer wb.mu.Unlock()
 
+	// 不存在缓存的数据 直接返回
 	if len(wb.pendingWrites) == 0 {
 		return nil
 	}
 
+	// 数据量过大 返回错误
 	if uint(len(wb.pendingWrites)) > wb.options.MaxBatchSize {
 		return ErrExceedMaxBatchNum
 	}
