@@ -9,15 +9,8 @@ import (
 
 // 测试完成之后销毁 DB 数据目录
 func destroyDB(db *DB) {
-	if db != nil {
-		if db.activeFile != nil {
-			_ = db.Close()
-		}
-		err := os.RemoveAll(db.options.DirPath)
-		if err != nil {
-			panic(err)
-		}
-	}
+	_ = db.Close()
+	_ = os.RemoveAll(db.options.DirPath)
 }
 
 func TestOpen(t *testing.T) {
@@ -26,6 +19,7 @@ func TestOpen(t *testing.T) {
 	opts.DirPath = dir
 	db, err := Open(opts)
 	defer destroyDB(db)
+
 	assert.Nil(t, err)
 	assert.NotNil(t, db)
 }
@@ -155,7 +149,7 @@ func TestDB_Get(t *testing.T) {
 	assert.NotNil(t, val7)
 	assert.Equal(t, val3, val7)
 
-	val8, err := db.Get(utils.GetTestKey(33))
+	val8, err := db2.Get(utils.GetTestKey(33))
 	assert.Equal(t, 0, len(val8))
 	assert.Equal(t, ErrKeyNotFound, err)
 	err = db2.Close()
@@ -202,9 +196,6 @@ func TestDB_Delete(t *testing.T) {
 
 	// 5.重启之后，再进行校验
 	err = db.Close()
-	assert.Nil(t, err)
-
-	err = db.activeFile.Close()
 	assert.Nil(t, err)
 
 	// 重启数据库

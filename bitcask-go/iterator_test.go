@@ -11,13 +11,13 @@ func TestDB_NewIterator(t *testing.T) {
 	opts := DefaultOptions
 	dir, _ := os.MkdirTemp("", "bitcask-go-iterator-1")
 	opts.DirPath = dir
-	opts.DataFileSize = 64 * 1024 * 1024
 	db, err := Open(opts)
 	defer destroyDB(db)
 	assert.Nil(t, err)
 	assert.NotNil(t, db)
 
 	iterator := db.NewIterator(DefaultIteratorOptions)
+	defer iterator.Close()
 	assert.NotNil(t, iterator)
 	assert.Equal(t, false, iterator.Valid())
 }
@@ -26,7 +26,6 @@ func TestIterator_One_Value(t *testing.T) {
 	opts := DefaultOptions
 	dir, _ := os.MkdirTemp("", "bitcask-go-iterator-2")
 	opts.DirPath = dir
-	opts.DataFileSize = 64 * 1024 * 1024
 	db, err := Open(opts)
 	defer destroyDB(db)
 	assert.Nil(t, err)
@@ -36,6 +35,7 @@ func TestIterator_One_Value(t *testing.T) {
 	assert.Nil(t, err)
 
 	iterator := db.NewIterator(DefaultIteratorOptions)
+	defer iterator.Close()
 	assert.NotNil(t, iterator)
 	assert.Equal(t, true, iterator.Valid())
 	assert.Equal(t, utils.GetTestKey(10), iterator.Key())
@@ -48,7 +48,6 @@ func TestIterator_Multi_Values(t *testing.T) {
 	opts := DefaultOptions
 	dir, _ := os.MkdirTemp("", "bitcask-go-iterator-3")
 	opts.DirPath = dir
-	opts.DataFileSize = 64 * 1024 * 1024
 	db, err := Open(opts)
 	defer destroyDB(db)
 	assert.Nil(t, err)
@@ -69,6 +68,7 @@ func TestIterator_Multi_Values(t *testing.T) {
 
 	// 正向迭代
 	iter1 := db.NewIterator(DefaultIteratorOptions)
+	defer iter1.Close()
 	for iter1.Rewind(); iter1.Valid(); iter1.Next() {
 		val, err := iter1.Value()
 		assert.Nil(t, err)
@@ -85,6 +85,7 @@ func TestIterator_Multi_Values(t *testing.T) {
 	iterOpts1 := DefaultIteratorOptions
 	iterOpts1.Reverse = true
 	iter2 := db.NewIterator(iterOpts1)
+	defer iter2.Close()
 	for iter2.Rewind(); iter2.Valid(); iter2.Next() {
 		val, err := iter2.Value()
 		assert.Nil(t, err)
@@ -101,6 +102,7 @@ func TestIterator_Multi_Values(t *testing.T) {
 	iterOpts2 := DefaultIteratorOptions
 	iterOpts2.Prefix = []byte("Alt")
 	iter3 := db.NewIterator(iterOpts2)
+	defer iter3.Close()
 	for iter3.Rewind(); iter3.Valid(); iter3.Next() {
 		assert.NotNil(t, iter3.Key())
 		t.Log("key = ", string(iter3.Key()))

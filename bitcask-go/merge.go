@@ -151,6 +151,9 @@ func (db *DB) Merge() error {
 func (db *DB) getMergePath() string {
 	dir := path.Dir(path.Clean(db.options.DirPath))
 	base := path.Base(db.options.DirPath)
+	if dir == "." {
+		dir = ""
+	}
 	return filepath.Join(dir, base+mergeDirName)
 }
 
@@ -176,6 +179,9 @@ func (db *DB) loadMergeFiles() error {
 	for _, entry := range dirEntries {
 		if entry.Name() == data.MergeFinishedFileName {
 			mergeFinished = true
+		}
+		if entry.Name() == data.SeqNoFileName {
+			continue
 		}
 		mergeFileNames = append(mergeFileNames, entry.Name())
 	}
