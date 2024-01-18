@@ -8,7 +8,7 @@ import (
 )
 
 func destroyFile(name string) {
-	if err := os.Remove(name); err != nil {
+	if err := os.RemoveAll(name); err != nil {
 		panic(err)
 	}
 }
@@ -16,7 +16,6 @@ func destroyFile(name string) {
 func TestNewFileIOManager(t *testing.T) {
 	path := filepath.Join("../tmp", "a.data")
 	fio, err := NewFileIOManager(path)
-	t.Log(path)
 
 	assert.Nil(t, err)
 	assert.NotNil(t, fio)

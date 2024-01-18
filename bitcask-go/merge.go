@@ -4,7 +4,6 @@ import (
 	"bitcask-go/data"
 	"io"
 	"os"
-	"path"
 	"path/filepath"
 	"sort"
 	"strconv"
@@ -149,11 +148,14 @@ func (db *DB) Merge() error {
 }
 
 func (db *DB) getMergePath() string {
-	dir := path.Dir(path.Clean(db.options.DirPath))
-	base := path.Base(db.options.DirPath)
-	if dir == "." {
-		dir = ""
-	}
+	// 此处应使用 file 而非path
+	// path 主要用于处理以斜杠(/)分隔的路径（Unix 风格），
+	// 而 filepath 会根据运行程序的操作系统来处理路径
+	//（例如，在 Windows 上使用反斜杠(\)）。如果您的代码是跨平台的
+	// 建议始终使用 filepath 而不是 path。
+	dir := filepath.Dir(filepath.Clean(db.options.DirPath))
+	base := filepath.Base(db.options.DirPath)
+
 	return filepath.Join(dir, base+mergeDirName)
 }
 
