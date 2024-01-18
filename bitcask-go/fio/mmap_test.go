@@ -9,6 +9,7 @@ import (
 
 func TestMMap_Read(t *testing.T) {
 	path := filepath.Join("../tmp", "mmap-a.data")
+	defer destroyFile(path)
 
 	mmapIO, err := NewMMapIOManager(path)
 	assert.Nil(t, err)
