@@ -347,5 +347,30 @@ func TestDB_Open2(t *testing.T) {
 	t.Log("open time", time.Since(now))
 	assert.Nil(t, err)
 	assert.NotNil(t, db)
+}
 
+func TestDB_Stat(t *testing.T) {
+	opts := DefaultOptions
+	dir, _ := os.MkdirTemp("", "bitcask-go-stat")
+	opts.DirPath = dir
+	db, err := Open(opts)
+	defer destroyDB(db)
+	assert.Nil(t, err)
+	assert.NotNil(t, db)
+
+	for i := 100; i < 10000; i++ {
+		err := db.Put(utils.GetTestKey(i), utils.RandomValue(128))
+		assert.Nil(t, err)
+	}
+	for i := 100; i < 1000; i++ {
+		err := db.Delete(utils.GetTestKey(i))
+		assert.Nil(t, err)
+	}
+	for i := 2000; i < 5000; i++ {
+		err := db.Put(utils.GetTestKey(i), utils.RandomValue(128))
+		assert.Nil(t, err)
+	}
+
+	stat := db.Stat()
+	assert.NotNil(t, stat)
 }
