@@ -121,3 +121,64 @@ func TestRedisDataStructure_HDel(t *testing.T) {
 	assert.Nil(t, err)
 	assert.True(t, del2)
 }
+
+func TestRedisDataStructure_SIsMember(t *testing.T) {
+	opts := bitcask.DefaultOptions
+	dir, _ := os.MkdirTemp("", "bitcask-go-redis-hdel")
+	opts.DirPath = dir
+	rds, err := NewRedisDataStructure(opts)
+	assert.Nil(t, err)
+
+	ok, err := rds.SAdd(utils.GetTestKey(1), []byte("val-1"))
+	assert.Nil(t, err)
+	assert.True(t, ok)
+	ok2, err := rds.SAdd(utils.GetTestKey(1), []byte("val-1"))
+	assert.Nil(t, err)
+	assert.False(t, ok2)
+	ok3, err := rds.SAdd(utils.GetTestKey(1), []byte("val-2"))
+	assert.Nil(t, err)
+	assert.True(t, ok3)
+
+	// key 不存在的时候
+	ok, err = rds.SIsMember(utils.GetTestKey(2), []byte("val-1"))
+	t.Log(ok, err)
+	assert.Nil(t, err)
+	assert.False(t, ok)
+	ok, err = rds.SIsMember(utils.GetTestKey(1), []byte("val-1"))
+	assert.Nil(t, err)
+	assert.True(t, ok)
+
+	ok, err = rds.SIsMember(utils.GetTestKey(1), []byte("val-2"))
+	assert.Nil(t, err)
+	assert.True(t, ok)
+	ok, err = rds.SIsMember(utils.GetTestKey(1), []byte("val-not-exist"))
+	assert.Nil(t, err)
+	assert.False(t, ok)
+}
+
+func TestRedisDataStructure_SRem(t *testing.T) {
+	opts := bitcask.DefaultOptions
+	dir, _ := os.MkdirTemp("", "bitcask-go-redis-hdel")
+	opts.DirPath = dir
+	rds, err := NewRedisDataStructure(opts)
+	assert.Nil(t, err)
+
+	ok, err := rds.SAdd(utils.GetTestKey(1), []byte("val-1"))
+	assert.Nil(t, err)
+	assert.True(t, ok)
+	ok2, err := rds.SAdd(utils.GetTestKey(1), []byte("val-1"))
+	assert.Nil(t, err)
+	assert.False(t, ok2)
+	ok3, err := rds.SAdd(utils.GetTestKey(1), []byte("val-2"))
+	assert.Nil(t, err)
+	assert.True(t, ok3)
+
+	// 删除不存在的 key
+	ok, err = rds.SRem(utils.GetTestKey(2), []byte("val-1"))
+	assert.Nil(t, err)
+	assert.False(t, ok)
+
+	ok, err = rds.SRem(utils.GetTestKey(1), []byte("val-1"))
+	assert.Nil(t, err)
+	assert.True(t, ok)
+}
